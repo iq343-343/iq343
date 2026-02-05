@@ -5,3 +5,5 @@ node_modules/
 dist/
 build/
 *.log
+deploy_key
+deploy_key.pub

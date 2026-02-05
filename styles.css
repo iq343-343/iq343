@@ -52,28 +52,56 @@ body {
 
 /* Toggle Button Styling */
 .theme-toggle {
-  background: transparent;
-  border: 1px solid var(--stroke);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.theme-toggle__track {
+  width: 52px;
+  height: 28px;
+  background-color: var(--stroke);
+  border-radius: 99px;
+  position: relative;
+  transition: background-color 0.3s ease;
+  overflow: hidden;
+}
+
+.theme-toggle__knob {
+  width: 24px;
+  height: 24px;
+  background-color: transparent;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  position: absolute;
+  top: 2px;
+  left: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  color: var(--text);
-  padding: 0;
-  margin-right: -4px;
-  transition: all 0.2s ease;
-  font-size: 18px;
-  line-height: 1;
+  font-size: 20px;
+  /* Increased size since it's just the emoji now */
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: none;
 }
 
-.theme-toggle:hover {
-  background: var(--chip);
+.icon-sun {
+  display: none;
 }
 
-/* Ensure emojis toggle correctly */
+/* Dark Mode State */
+body.dark-theme .theme-toggle__track {
+  background-color: var(--accent);
+  /* Optional: Highlight track when active */
+}
+
+body.dark-theme .theme-toggle__knob {
+  transform: translateX(24px);
+  background-color: transparent;
+}
+
 body.dark-theme .icon-moon {
   display: none;
 }
@@ -220,27 +248,31 @@ body.dark-theme .logo__img {
   gap: 14px;
 }
 
-.cta-img {
+.btn-accent {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #4A00E0, #8E2DE2);
+  /* Blue to Purple Gradient */
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 999px;
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 10px rgba(74, 0, 224, 0.3);
 }
 
-.cta-img img {
-  display: block;
-  height: 36px;
-  width: auto;
-  transition: transform 180ms ease, filter 180ms ease;
-  will-change: transform, filter;
+.btn-accent:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 14px rgba(74, 0, 224, 0.4);
 }
 
-.cta-img:hover img,
-.cta-img:focus-visible img {
-  transform: translateY(-1px) scale(1.02);
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, .18));
-}
-
-.cta-img:active img {
-  transform: translateY(0) scale(0.99);
+.btn-accent:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(74, 0, 224, 0.3);
 }
 
 .topbar__handle {
@@ -1376,6 +1408,17 @@ body.dark-theme .logo__img {
   overflow: hidden;
 }
 
+.hero__video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 40px;
+  overflow: hidden;
+  z-index: -1;
+}
+
 .hero__video {
   position: absolute;
   top: 50%;
@@ -1386,11 +1429,9 @@ body.dark-theme .logo__img {
   min-height: 100%;
   width: auto;
   height: auto;
-  z-index: -1;
   object-fit: cover;
   opacity: 0.5;
   filter: blur(30px);
-  /* Heavy blur as requested (70%) */
 }
 
 
@@ -1410,76 +1451,14 @@ body.dark-theme .logo__img {
   letter-spacing: -0.00em;
 }
 
-.hero__tags {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
+/* Old tag styles removed to allow new .tag styles to apply */
 
-.hero__tags-inline {
-  display: inline;
-}
-
-.hero__tags-inline .tag {
-  margin-left: 6px;
-  vertical-align: middle;
-  animation: tagAppear 0.6s ease-out forwards;
-  opacity: 0;
-  transform: translateY(10px) scale(0.9);
-}
-
-.hero__tags-inline .tag:nth-child(1) {
-  animation-delay: 0.3s;
-}
-
-.hero__tags-inline .tag:nth-child(2) {
-  animation-delay: 0.5s;
-}
-
-.hero__tags-inline .tag:nth-child(3) {
-  animation-delay: 0.7s;
-}
-
-.hero__tags-inline .tag:nth-child(4) {
-  animation-delay: 0.9s;
-}
-
-.hero__tags-inline .tag:nth-child(5) {
-  animation-delay: 1.1s;
-}
-
-.hero__tags-inline .tag:nth-child(6) {
-  animation-delay: 1.3s;
-}
-
-@keyframes tagAppear {
-  0% {
-    opacity: 0;
-    transform: translateY(10px) scale(0.9);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Subtle pulse effect on hover */
-.hero__tags-inline .tag:hover {
-  animation: tagPulse 0.5s ease-in-out;
-}
-
-@keyframes tagPulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.08);
-  }
+@font-face {
+  font-family: 'HelveticaNeueCyr-Light';
+  src: url('./fonts/Helvetic/HelveticaNeueCyr-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
 
 .tag {
@@ -1492,12 +1471,62 @@ body.dark-theme .logo__img {
   font-weight: 500;
   color: #111;
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-family: 'HelveticaNeueCyr-Light', sans-serif;
+
+  /* Alignment Fixes */
+  vertical-align: middle;
+  margin-top: -4px;
+  /* Slight optical adjustment */
+
+  /* Entrance Animation */
+  animation: fadeUpReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
+/* Staggered Delays for Entrance */
+.tag:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.tag:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.tag:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.tag:nth-child(4) {
+  animation-delay: 0.25s;
+}
+
+.tag:nth-child(5) {
+  animation-delay: 0.3s;
+}
+
+.tag:nth-child(6) {
+  animation-delay: 0.35s;
+}
+
+/* Scale up on hover, no fade */
 a.tag:hover {
-  transform: translateY(-2px);
+  transform: scale(1.15);
+  z-index: 2;
+  /* Bring to front */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  /* Keep subtle shadow */
+}
+
+@keyframes fadeUpReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .tag--pink {

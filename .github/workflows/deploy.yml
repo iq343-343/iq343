@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev
 
 jobs:
   deploy:
@@ -16,6 +17,21 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /var/www/extract-studio
-            git pull
+            # Define variables based on branch
+            if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+              TARGET_DIR="/var/www/extract-studio"
+              BRANCH="main"
+              echo "🚀 Deploying to PRODUCTION..."
+            elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+              TARGET_DIR="/var/www/extract-studio-dev"
+              BRANCH="dev"
+              echo "🧪 Deploying to DEVELOPMENT..."
+            fi
+            
+            # Execute deployment
+            cd $TARGET_DIR
+            git fetch origin
+            git checkout $BRANCH
+            git pull origin $BRANCH
             sudo systemctl reload nginx
+            echo "✅ Deployed successfully!"

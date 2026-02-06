@@ -1,0 +1,72 @@
+#!/bin/bash
+SERVER="root@147.45.254.144"
+REPO="https://github.com/iq343-343/iq343.git"
+DIR="/var/www/extract-studio"
+DOMAIN="extract-studio.ru"
+EMAIL="burdin.md@gmail.com"
+
+# 0. Push local changes first
+echo "📤 Pushing changes to GitHub..."
+git push origin main
+if [ $? -ne 0 ]; then
+    echo "❌ Git push failed. Please check your GitHub credentials."
+    exit 1
+fi
+
+echo "🚀 Starting VPS Setup on $SERVER for $DOMAIN..."
+echo "You may be asked for your VPS password."
+
+# Read the local public key to inject it
+PUB_KEY=$(cat deploy_key.pub)
+
+ssh -t $SERVER "bash -s" << ENDSSH
+  # 1. Install Dependencies (Quietly)
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update > /dev/null
+  apt-get install -y git nginx python3-certbot-nginx > /dev/null
+
+  # 2. Setup Directory and Clone
+  echo "📂 Setting up directory $DIR..."
+  if [ -d "$DIR/.git" ]; then
+    cd $DIR && git pull
+  else
+    rm -rf $DIR 
+    git clone $REPO $DIR
+  fi
+
+  # 3. Configure Nginx
+  echo "⚙️ Configuring Nginx..."
+  cat > /etc/nginx/sites-available/$DOMAIN << 'EOF'
+server {
+    listen 80;
+    server_name $DOMAIN www.$DOMAIN;
+    root $DIR;
+    index index.html;
+    location / { try_files \$uri \$uri/ =404; }
+}
+EOF
+  ln -sf /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
+  rm -f /etc/nginx/sites-enabled/default
+  nginx -t && systemctl restart nginx
+  
+  # 4. SSL Setup
+  if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+    certbot --nginx --non-interactive --agree-tos --email $EMAIL --redirect -d $DOMAIN -d www.$DOMAIN
+  fi
+
+  # 5. Install Deployment Key for GitHub Actions
+  echo "🔑 Installing Deployment Key..."
+  mkdir -p ~/.ssh
+  chmod 700 ~/.ssh
+  touch ~/.ssh/authorized_keys
+  chmod 600 ~/.ssh/authorized_keys
+  # Check if key already exists to avoid duplicates
+  if ! grep -q "$PUB_KEY" ~/.ssh/authorized_keys; then
+      echo "$PUB_KEY" >> ~/.ssh/authorized_keys
+      echo "✅ Key installed."
+  else
+      echo "✅ Key already exists."
+  fi
+
+  echo "🎉 Setup Complete! Visit https://$DOMAIN"
+ENDSSH

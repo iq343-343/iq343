@@ -143,6 +143,27 @@ body {
   height: 100%;
 }
 
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
 body {
   margin: 0;
   font-family: "Helvetica Neue Cyr", Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
@@ -1619,6 +1640,10 @@ a.tag:hover {
   font-weight: 400;
   color: var(--text);
   letter-spacing: -0.02em;
+  /* Fix for text doubling/glitch */
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .case-icon {
@@ -2151,3 +2176,4 @@ body.dark-theme .team-emoji {
       font-size: 14px;
     }
   }
+}

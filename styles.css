@@ -2177,7 +2177,31 @@ body.dark-theme .team-emoji {
     }
   }
 }
-/* Contact Form Styles */
+/* Contact Section Styles */
+.contact-section {
+  padding-bottom: 40px;
+}
+
+.contact-card {
+  background: linear-gradient(135deg, #4A00E0, #8E2DE2); /* Gradient from btn-accent */
+  border-radius: 30px;
+  padding: 60px;
+  color: #fff;
+  text-align: center;
+}
+
+.contact-title {
+  margin-top: 0;
+  color: #fff;
+}
+
+.contact-desc {
+  margin-bottom: 40px;
+  opacity: 0.9;
+  font-size: 18px;
+}
+
+/* Contact Form Styles (Updated) */
 .contact-form {
   display: flex;
   flex-direction: column;
@@ -2202,24 +2226,37 @@ body.dark-theme .team-emoji {
 }
 
 .contact-form input {
-  padding: 14px 18px;
+  padding: 16px 22px; /* Slightly larger padding */
   border-radius: 12px;
-  border: 1px solid var(--stroke);
-  background: var(--input-bg);
-  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1); /* Glassmorphic input */
+  color: #fff;
   font-size: 16px;
-  font-family: inherit;
+  font-family: "Helvetica Neue Cyr", Inter, ui-sans-serif; /* Explicitly Helvetica */
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.contact-form input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(91, 108, 255, 0.2);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(5px);
 }
 
 .contact-form input::placeholder {
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.contact-form input:focus {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.btn--white {
+  background: #fff;
+  color: #4A00E0; /* Match gradient start */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn--white:hover {
+  background: #f0f0f0;
+  transform: translateY(-1px);
 }
 
 .form-message {
@@ -2227,17 +2264,28 @@ body.dark-theme .team-emoji {
   font-size: 14px;
   text-align: center;
   min-height: 20px;
+  color: #fff;
 }
 
 .form-message.success {
-  color: #22c55e;
+  background: rgba(34, 197, 94, 0.2);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(34, 197, 94, 0.5);
 }
 
 .form-message.error {
-  color: #ef4444;
+  background: rgba(239, 68, 68, 0.2);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.5);
 }
 
 @media (max-width: 600px) {
+  .contact-card {
+    padding: 30px;
+  }
+  
   .form-row {
     flex-direction: column;
     gap: 16px;

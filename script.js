@@ -296,3 +296,72 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(updateSlide, 100);
   });
 });
+// Contact Form Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('contact-form');
+  const messageDiv = document.getElementById('form-message');
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      messageDiv.textContent = 'Отправка...';
+      messageDiv.className = 'form-message';
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      // Validation
+      const phoneRegex = /^[\d\+\-\(\)\s]{5,}$/;
+      const telegramRegex = /^@?[a-zA-Z0-9_]{5,}$/;
+
+      if (!phoneRegex.test(data.phone)) {
+        messageDiv.textContent = 'Введите корректный номер телефона';
+        messageDiv.className = 'form-message error';
+        return;
+      }
+
+      if (!telegramRegex.test(data.telegram)) {
+        messageDiv.textContent = 'Введите корректный ник в Telegram (например, @username)';
+        messageDiv.className = 'form-message error';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          messageDiv.textContent = result.message;
+          messageDiv.className = 'form-message success';
+          form.reset();
+        } else {
+          messageDiv.textContent = result.message || 'Ошибка отправки';
+          messageDiv.className = 'form-message error';
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        messageDiv.textContent = 'Произошла ошибка при отправке. Попробуйте позже.';
+        messageDiv.className = 'form-message error';
+      }
+    });
+
+    // Formatting Telegram Input
+    const telegramInput = document.getElementById('telegram');
+    if (telegramInput) {
+      telegramInput.addEventListener('blur', (e) => {
+        let val = e.target.value.trim();
+        if (val && !val.startsWith('@')) {
+          e.target.value = '@' + val;
+        }
+      });
+    }
+  }
+});

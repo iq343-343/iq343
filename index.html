@@ -33,7 +33,7 @@
                         </div>
                     </div>
                 </button>
-                <a class="topbar__cta btn-accent" href="https://t.me/extract343" target="_blank" rel="noopener">
+                <a class="topbar__cta btn-accent" href="#contact-section">
                     Давайте работать
                 </a>
             </div>
@@ -585,10 +585,38 @@
                 </div>
 
                 <div class="work-cta">
-                    <a class="btn btn--primary btn--wide" href="https://t.me/extract343" target="_blank"
-                        rel="noopener">Обсудить проект</a>
+                    <a class="btn btn--primary btn--wide" href="#contact-section">Заполнить заявку</a>
                 </div>
             </div>
+        </section>
+
+        <section class="contact-section container" id="contact-section">
+            <div class="contact-card">
+                <h2 class="contact-title">Оставить заявку</h2>
+                <p class="contact-desc">Заполните форму, и мы свяжемся с вами в ближайшее время.</p>
+
+                <form id="contact-form" class="contact-form">
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" placeholder="Ваше имя" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="project" name="project" placeholder="Название проекта (опционально)">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="tel" id="phone" name="phone" placeholder="Телефон" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="telegram" name="telegram" placeholder="Ник в Telegram (@username)"
+                                required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn--white btn--wide">Отправить</button>
+                </form>
+                <div id="form-message" class="form-message"></div>
+            </div>
+        </section>
+        </div>
         </section>
 
         <section class="inhouse container" id="inhouse">

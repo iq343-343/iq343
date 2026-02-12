@@ -27,6 +27,22 @@ ssh -t $SERVER "bash -s" << ENDSSH
   
   # 1. Setup Directory and Clone (DEV Branch)
   echo "📂 Setting up directory $DIR..."
+  apt-get update > /dev/null
+  apt-get install -y git nginx python3-certbot-nginx curl > /dev/null
+
+  # Install Node.js (v20)
+  if ! command -v node &> /dev/null; then
+    echo "📦 Installing Node.js..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - > /dev/null
+    apt-get install -y nodejs > /dev/null
+  fi
+
+  # Install PM2 globally
+  if ! command -v pm2 &> /dev/null; then
+    echo "📦 Installing PM2..."
+    npm install -g pm2 > /dev/null
+  fi
+
   mkdir -p $DIR
   
   if [ -d "$DIR/.git" ]; then
@@ -36,7 +52,21 @@ ssh -t $SERVER "bash -s" << ENDSSH
     git clone -b $BRANCH $REPO $DIR
   fi
 
-  # 2. Configure Nginx for DEV
+  # 2. Setup Backend
+  echo "🔧 Setting up Backend..."
+  cd $DIR
+  npm install --production > /dev/null
+
+  # Create .env file on server (Basic dev config)
+  echo "TELEGRAM_BOT_TOKEN=8437314985:AAGI1qaOW2KjC2AYWLIZ8eUyetIxe1iuHzg" > .env
+  echo "TELEGRAM_CHAT_ID=71247264" >> .env
+  echo "PORT=3001" >> .env
+
+  # Start/Restart Server with PM2 (Dev Port 3001)
+  pm2 start server.js --name "extract-backend-dev" --update-env || pm2 restart "extract-backend-dev" --update-env
+  pm2 save
+
+  # 3. Configure Nginx for DEV
   echo "⚙️ Configuring Nginx for DEV..."
   cat > /etc/nginx/sites-available/$DOMAIN << 'EOF'
 server {
@@ -44,7 +74,19 @@ server {
     server_name $DOMAIN;
     root $DIR;
     index index.html;
-    location / { try_files \$uri \$uri/ =404; }
+
+    location / { 
+        try_files \$uri \$uri/ =404; 
+    }
+
+    location /api/ {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
+    }
 }
 EOF
   ln -sf /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/

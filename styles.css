@@ -2177,3 +2177,69 @@ body.dark-theme .team-emoji {
     }
   }
 }
+/* Contact Form Styles */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.contact-form input {
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--stroke);
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-form input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(91, 108, 255, 0.2);
+}
+
+.contact-form input::placeholder {
+  color: var(--muted);
+}
+
+.form-message {
+  margin-top: 16px;
+  font-size: 14px;
+  text-align: center;
+  min-height: 20px;
+}
+
+.form-message.success {
+  color: #22c55e;
+}
+
+.form-message.error {
+  color: #ef4444;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+}

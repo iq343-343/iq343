@@ -96,6 +96,27 @@
     }
   });
 
+  // --- Lenis Smooth Scroll Setup ---
+  if (typeof Lenis !== 'undefined') {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      direction: 'vertical',
+      gestureDirection: 'vertical',
+      smooth: true,
+      mouseMultiplier: 1,
+      smoothTouch: false,
+      touchMultiplier: 2,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+  }
+
 })();
 
 // Accordion Logic
@@ -244,7 +265,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Initialize size
-    window.addEventListener('resize', updateSlide);
+    // Initialize size
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updateSlide, 100);
+    });
 
     nextBtn.addEventListener('click', (e) => {
       e.stopPropagation(); // Prevent accordion toggle

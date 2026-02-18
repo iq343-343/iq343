@@ -22,7 +22,7 @@ echo "🚀 Starting DEV Setup on $SERVER for $DOMAIN..."
 # Read public key
 PUB_KEY=$(cat deploy_key.pub)
 
-ssh -tt $SERVER "bash -s" << ENDSSH
+ssh -i deploy_key -tt $SERVER "bash -s" << ENDSSH
   export DEBIAN_FRONTEND=noninteractive
   
   # 1. Setup Directory and Clone (DEV Branch)

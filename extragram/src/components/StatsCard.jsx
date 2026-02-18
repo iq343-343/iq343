@@ -45,7 +45,7 @@ const StatsCard = ({ data }) => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 {/* Subscribers */}
                 <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-5 ring-1 ring-white/10">
                     <div className="flex items-center gap-2 mb-3">

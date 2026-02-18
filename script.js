@@ -115,6 +115,16 @@
     }
 
     requestAnimationFrame(raf);
+
+    // Handle /products deep link
+    if (window.location.pathname === '/products') {
+      const productsSection = document.getElementById('products');
+      if (productsSection) {
+        setTimeout(() => {
+          lenis.scrollTo(productsSection);
+        }, 500);
+      }
+    }
   }
 
 })();

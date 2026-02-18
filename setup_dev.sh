@@ -22,7 +22,7 @@ echo "🚀 Starting DEV Setup on $SERVER for $DOMAIN..."
 # Read public key
 PUB_KEY=$(cat deploy_key.pub)
 
-ssh -t $SERVER "bash -s" << ENDSSH
+ssh -tt $SERVER "bash -s" << ENDSSH
   export DEBIAN_FRONTEND=noninteractive
   
   # 1. Setup Directory and Clone (DEV Branch)
@@ -52,10 +52,17 @@ ssh -t $SERVER "bash -s" << ENDSSH
     git clone -b $BRANCH $REPO $DIR
   fi
 
-  # 2. Setup Backend
-  echo "🔧 Setting up Backend..."
+  # 2. Setup Backend & Frontend Build
+  echo "🔧 Setting up Backend & Building Extragram..."
   cd $DIR
   npm install --production > /dev/null
+
+  # Build Extragram
+  echo "📦 Building Extragram..."
+  cd $DIR/extragram
+  npm install > /dev/null
+  npm run build
+  cd $DIR
 
   # Create .env file on server (Basic dev config)
   echo "TELEGRAM_BOT_TOKEN=8437314985:AAGI1qaOW2KjC2AYWLIZ8eUyetIxe1iuHzg" > .env
@@ -76,7 +83,12 @@ server {
     index index.html;
 
     location / { 
-        try_files \$uri \$uri/ =404; 
+        try_files \$uri \$uri/ /index.html; 
+    }
+
+    location /extragram/ {
+        alias /var/www/extract-studio-dev/extragram/dist/;
+        try_files \$uri \$uri/ /extragram/index.html;
     }
 
     location /api/ {

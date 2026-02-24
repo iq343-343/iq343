@@ -296,168 +296,89 @@ function fillComparison(data) {
     });
 }
 
-function drawAxes(ctx, width, height, padding) {
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(padding, padding);
-    ctx.lineTo(padding, height - padding + 10);
-    ctx.lineTo(width - padding, height - padding + 10);
-    ctx.stroke();
-}
-
-function drawNoData(ctx, width, height, text) {
-    ctx.fillStyle = "rgba(148, 163, 184, 0.8)";
-    ctx.font = "20px JetBrains Mono, monospace";
-    ctx.textAlign = "center";
-    ctx.fillText(text, width / 2, height / 2);
-    ctx.textAlign = "left";
-}
-
-function hideChartTooltip() {
-    chartTooltip.classList.add("hidden");
-}
-
-function showChartTooltip(x, y, title, value) {
-    chartTooltip.innerHTML = `<div class="tt-title">${title}</div><div class="tt-value">${value}</div>`;
-    chartTooltip.style.left = `${x + 14}px`;
-    chartTooltip.style.top = `${y + 14}px`;
-    chartTooltip.classList.remove("hidden");
-}
-
-function renderBarValueLabel(ctx, xCenter, yTop, value) {
-    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-    ctx.font = "16px JetBrains Mono, monospace";
-    ctx.textAlign = "center";
-    ctx.fillText(value, xCenter, Math.max(34, yTop - 12));
-}
+// Canvas helpers removed, chart is now constructed via HTML DOM.
 
 function drawBarsChart(payload) {
-    const ctx = barsCanvas.getContext("2d");
-    const { width, height } = barsCanvas;
-    const padding = 52;
-    barsHoverRects = [];
-    ctx.clearRect(0, 0, width, height);
-    drawAxes(ctx, width, height, padding);
+    const container = document.getElementById("barsChartContainer");
+    if (!container) return;
+
+    container.innerHTML = "";
 
     const maxStats = payload.max.exists ? payload.max.stats : {};
 
     const metrics = [
-        {
-            label: "Подписчики",
-            tg: payload.telegram.subscribers,
-            mx: maxStats.subscribers,
-            format: "integer"
-        },
-        {
-            label: "Сред. охват",
-            tg: payload.telegram.avgViews,
-            mx: maxStats.avgViews,
-            format: "integer"
-        },
-        {
-            label: "Охват (%)",
-            tg: payload.telegram.avgPostReachPct,
-            mx: maxStats.avgPostReachPct,
-            format: "percent"
-        }
+        { label: "Подписчики", tg: payload.telegram.subscribers, mx: maxStats.subscribers, format: "integer" },
+        { label: "Сред. охват", tg: payload.telegram.avgViews, mx: maxStats.avgViews, format: "integer" },
+        { label: "Охват (%)", tg: payload.telegram.avgPostReachPct, mx: maxStats.avgPostReachPct, format: "percent" }
     ];
 
     const allValues = metrics.flatMap((m) => [m.tg, m.mx]).filter((value) => hasNumber(value));
     if (!allValues.length) {
-        drawNoData(ctx, width, height, "Недостаточно открытых данных для сравнения KPI");
-        hideChartTooltip();
+        container.innerHTML = `<div class="w-full h-full flex items-center justify-center text-slate-400 text-sm md:text-lg text-center font-display">Недостаточно открытых данных для сравнения KPI</div>`;
         return;
     }
 
-    const maxValue = Math.max(...allValues) * 1.15;
-    const barGroupWidth = (width - padding * 2) / metrics.length;
-    const barWidth = 62;
+    const maxValue = Math.max(...allValues) * 1.15; // 15% headroom
 
-    metrics.forEach((metric, i) => {
-        const center = padding + barGroupWidth * i + barGroupWidth / 2;
+    const grid = document.createElement('div');
+    grid.className = "w-full h-full flex justify-between gap-2 md:gap-8 pb-8 border-b border-slate-700 relative";
+
+    metrics.forEach(metric => {
+        const group = document.createElement('div');
+        group.className = "flex-1 flex flex-col justify-end items-center relative h-full gap-2";
+
+        const barsWrapper = document.createElement('div');
+        barsWrapper.className = "w-full flex items-end justify-center gap-1 md:gap-3 h-full";
+
+        // Telegram Bar
         const tgValue = hasNumber(metric.tg) ? metric.tg : 0;
-        const mxValue = hasNumber(metric.mx) ? metric.mx : 0;
-        const tgH = (tgValue / maxValue) * (height - padding * 2);
-        const mxH = (mxValue / maxValue) * (height - padding * 2);
-        const tgX = center - barWidth - 10;
-        const mxX = center + 10;
-        const tgY = height - padding - tgH;
-        const mxY = height - padding - mxH;
-
-        ctx.fillStyle = "#3b82f6";
-        ctx.fillRect(tgX, tgY, barWidth, tgH);
-
-        ctx.fillStyle = "#a855f7";
-        ctx.fillRect(mxX, mxY, barWidth, mxH);
-
+        const tgHeightPct = maxValue > 0 ? (tgValue / maxValue) * 100 : 0;
+        const tgBar = document.createElement('div');
+        tgBar.className = "w-1/2 max-w-[50px] bg-blue-500 rounded-t-md relative group transition-all duration-500 flex flex-col justify-end items-center";
+        tgBar.style.height = `${Math.max(tgHeightPct, 2)}%`;
         if (hasNumber(metric.tg)) {
-            renderBarValueLabel(ctx, tgX + barWidth / 2, tgY, formatMetric(metric.tg, metric.format));
+            const label = document.createElement('span');
+            label.className = "absolute -top-6 text-[10px] md:text-xs font-bold text-white whitespace-nowrap";
+            label.textContent = formatMetric(metric.tg, metric.format);
+            tgBar.appendChild(label);
         }
+
+        // Max Bar
+        const mxValue = hasNumber(metric.mx) ? metric.mx : 0;
+        const mxHeightPct = maxValue > 0 ? (mxValue / maxValue) * 100 : 0;
+        const mxBar = document.createElement('div');
+        mxBar.className = "w-1/2 max-w-[50px] bg-purple-500 rounded-t-md relative group transition-all duration-500 flex flex-col justify-end items-center";
+        mxBar.style.height = `${Math.max(mxHeightPct, 2)}%`;
         if (hasNumber(metric.mx)) {
-            renderBarValueLabel(ctx, mxX + barWidth / 2, mxY, formatMetric(metric.mx, metric.format));
+            const label = document.createElement('span');
+            label.className = "absolute -top-6 text-[10px] md:text-xs font-bold text-white whitespace-nowrap";
+            label.textContent = formatMetric(metric.mx, metric.format);
+            mxBar.appendChild(label);
         }
 
-        barsHoverRects.push({
-            x: tgX,
-            y: tgY,
-            w: barWidth,
-            h: tgH,
-            title: `Telegram • ${metric.label}`,
-            value: formatMetric(metric.tg, metric.format)
-        });
-        barsHoverRects.push({
-            x: mxX,
-            y: mxY,
-            w: barWidth,
-            h: mxH,
-            title: `MAX • ${metric.label}`,
-            value: formatMetric(metric.mx, metric.format)
-        });
+        barsWrapper.appendChild(tgBar);
+        barsWrapper.appendChild(mxBar);
+        group.appendChild(barsWrapper);
 
-        ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-        ctx.font = "16px JetBrains Mono, monospace";
-        ctx.textAlign = "center";
-        ctx.fillText(metric.label, center, height - padding + 34);
+        const groupLabel = document.createElement('div');
+        groupLabel.className = "absolute -bottom-8 w-full text-center text-[10px] md:text-[13px] text-slate-300 font-medium break-words leading-tight";
+        groupLabel.textContent = metric.label;
+        group.appendChild(groupLabel);
+
+        grid.appendChild(group);
     });
 
-    ctx.textAlign = "left";
-    ctx.fillStyle = "#3b82f6";
-    ctx.fillRect(padding, 18, 14, 4);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.font = "14px JetBrains Mono, monospace";
-    ctx.fillText("Telegram", padding + 22, 24);
-    ctx.fillStyle = "#a855f7";
-    ctx.fillRect(padding + 125, 18, 14, 4);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.fillText("MAX", padding + 148, 24);
+    container.appendChild(grid);
+
+    // Legend
+    const legend = document.createElement('div');
+    legend.className = "absolute top-0 right-0 flex gap-4 text-[10px] md:text-xs font-medium text-slate-300 bg-slate-800/80 px-3 py-1.5 rounded-full ring-1 ring-white/10 z-10";
+    legend.innerHTML = `
+        <div class="flex items-center gap-2"><div class="w-3 h-3 bg-blue-500 rounded-full"></div>Telegram</div>
+        <div class="flex items-center gap-2"><div class="w-3 h-3 bg-purple-500 rounded-full"></div>MAX</div>
+    `;
+    container.appendChild(legend);
 }
-
-barsCanvas.addEventListener("mousemove", (event) => {
-    const rect = barsCanvas.getBoundingClientRect();
-    const scaleX = barsCanvas.width / rect.width;
-    const scaleY = barsCanvas.height / rect.height;
-    const x = (event.clientX - rect.left) * scaleX;
-    const y = (event.clientY - rect.top) * scaleY;
-
-    const hovered = barsHoverRects.find((item) => (
-        x >= item.x &&
-        x <= item.x + item.w &&
-        y >= item.y &&
-        y <= item.y + item.h
-    ));
-
-    if (!hovered) {
-        hideChartTooltip();
-        return;
-    }
-
-    showChartTooltip(event.clientX, event.clientY, hovered.title, hovered.value);
-});
-
-barsCanvas.addEventListener("mouseleave", () => {
-    hideChartTooltip();
-});
 
 function render(payload) {
     results.classList.remove("revealed");

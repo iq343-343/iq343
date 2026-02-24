@@ -11,7 +11,7 @@ const TELEGRAM_PUBLIC_BASE_URL =
 const MAXCHART_BASE_URL = process.env.MAXCHART_BASE_URL || "https://maxchart.ru";
 const MAX_PUBLIC_BASE_URL = process.env.MAX_PUBLIC_BASE_URL || "https://max.ru";
 const API_TIMEOUT_MS = Number(process.env.API_TIMEOUT_MS || 12000);
-const MAX_MATCH_THRESHOLD = Number(process.env.MAX_MATCH_THRESHOLD || 0.5);
+const MAX_MATCH_THRESHOLD = Number(process.env.MAX_MATCH_THRESHOLD || 0.51);
 const MAXCHART_SEARCH_PAGES = Number(process.env.MAXCHART_SEARCH_PAGES || 8);
 const MAXCHART_SEARCH_PAGE_SIZE = Number(process.env.MAXCHART_SEARCH_PAGE_SIZE || 20);
 

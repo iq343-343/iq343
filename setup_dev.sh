@@ -83,6 +83,7 @@ ssh -i deploy_key -tt $SERVER "bash -s" << ENDSSH
   # Set permissions
   echo "🔐 Setting permissions..."
   chmod -R 755 $DIR
+  chown -R www-data:www-data $DIR/extrapars/public
 
   # 3. Configure Nginx for DEV
   echo "⚙️ Configuring Nginx for DEV..."
@@ -105,7 +106,7 @@ server {
     location /extrapars/ {
         alias /var/www/extract-studio-dev/extrapars/public/;
         index index.html;
-        try_files \$uri \$uri/ /extrapars/index.html;
+        try_files \$uri \$uri/ =404;
     }
 
     location /extrapars/api/ {

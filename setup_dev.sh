@@ -83,7 +83,7 @@ ssh -i deploy_key -tt $SERVER "bash -s" << ENDSSH
   # Set permissions
   echo "🔐 Setting permissions..."
   chmod -R 755 $DIR
-  chown -R www-data:www-data $DIR/extrapars/public
+  chown -R www-data:www-data $DIR
 
   # 3. Configure Nginx for DEV
   echo "⚙️ Configuring Nginx for DEV..."
@@ -91,7 +91,7 @@ ssh -i deploy_key -tt $SERVER "bash -s" << ENDSSH
 server {
     listen 80;
     server_name $DOMAIN;
-    root $DIR;
+    root /var/www/extract-studio-dev;
     index index.html;
 
     location / { 
@@ -106,7 +106,7 @@ server {
     location /extrapars/ {
         alias /var/www/extract-studio-dev/extrapars/public/;
         index index.html;
-        try_files \$uri \$uri/ =404;
+        try_files \$uri \$uri/ /index.html =404;
     }
 
     location /extrapars/api/ {
@@ -135,6 +135,14 @@ EOF
   ln -sf /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
   nginx -t && systemctl reload nginx
   
+  # Diagnostics
+  echo "🔍 Running diagnostics..."
+  pm2 status
+  echo "🌐 Checking ports..."
+  netstat -tulpn | grep -E '3001|3002'
+  echo "📜 Latest Nginx errors:"
+  tail -n 10 /var/log/nginx/error.log
+
   # 3. SSL Setup
   if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
     certbot --nginx --non-interactive --agree-tos --email $EMAIL --redirect -d $DOMAIN

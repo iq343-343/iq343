@@ -872,7 +872,7 @@ async function analyzeChannel(rawChannelInput) {
             if (best && best.score >= MAX_MATCH_THRESHOLD) {
                 const detailUrl = buildUrl(MAXCHART_BASE_URL, `channel/${best.slug}`);
                 const detailRes = await fetchText(detailUrl);
-                if (detailRes.ok) {
+                if (detailRes.response.ok) {
                     maxResult = {
                         exists: true,
                         stats: parseMaxChartStats(best.slug, detailRes.text),

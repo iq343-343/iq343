@@ -107,10 +107,10 @@ function buildKpiCard(title, value, note = "") {
     card.className = "bg-slate-800/50 backdrop-blur-sm rounded-2xl p-5 ring-1 ring-white/10 flex flex-col justify-between transition hover:bg-slate-800/80";
     card.innerHTML = `
       <div>
-        <span class="text-slate-400 text-xs font-medium uppercase tracking-wider block mb-2">${title}</span>
-        <div class="text-2xl font-bold text-white">${value}</div>
+        <span class="text-slate-400 text-[10px] font-medium uppercase tracking-wider block mb-2 break-words line-clamp-2">${title}</span>
+        <div class="text-lg md:text-xl font-bold text-white break-words">${value}</div>
       </div>
-      ${note ? `<div class="text-[10px] text-slate-500 mt-4 pt-2 border-t border-slate-700/50 leading-tight">${note}</div>` : ""}
+      ${note ? `<div class="text-[10px] text-slate-500 mt-3 pt-2 border-t border-slate-700/50 leading-loose break-words">${note}</div>` : ""}
   `;
     return card;
 }
@@ -289,8 +289,8 @@ function fillComparison(data) {
         const card = document.createElement("div");
         card.className = "bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 ring-1 ring-white/10";
         card.innerHTML = `
-      <div class="text-slate-400 text-[10px] uppercase font-medium tracking-wider mb-2">${item.title}</div>
-      <div class="text-lg font-bold text-white">${item.value}</div>
+      <div class="text-slate-400 text-[9px] uppercase font-medium tracking-wider mb-2 break-words line-clamp-2">${item.title}</div>
+      <div class="text-base md:text-lg font-bold text-white break-words">${item.value}</div>
     `;
         comparisonGrid.appendChild(card);
     });
@@ -308,7 +308,7 @@ function drawAxes(ctx, width, height, padding) {
 
 function drawNoData(ctx, width, height, text) {
     ctx.fillStyle = "rgba(148, 163, 184, 0.8)";
-    ctx.font = "14px JetBrains Mono, monospace";
+    ctx.font = "20px JetBrains Mono, monospace";
     ctx.textAlign = "center";
     ctx.fillText(text, width / 2, height / 2);
     ctx.textAlign = "left";
@@ -327,9 +327,9 @@ function showChartTooltip(x, y, title, value) {
 
 function renderBarValueLabel(ctx, xCenter, yTop, value) {
     ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-    ctx.font = "12px JetBrains Mono, monospace";
+    ctx.font = "16px JetBrains Mono, monospace";
     ctx.textAlign = "center";
-    ctx.fillText(value, xCenter, Math.max(34, yTop - 8));
+    ctx.fillText(value, xCenter, Math.max(34, yTop - 12));
 }
 
 function drawBarsChart(payload) {
@@ -416,7 +416,7 @@ function drawBarsChart(payload) {
         });
 
         ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-        ctx.font = "12px JetBrains Mono, monospace";
+        ctx.font = "16px JetBrains Mono, monospace";
         ctx.textAlign = "center";
         ctx.fillText(metric.label, center, height - padding + 34);
     });
@@ -425,7 +425,7 @@ function drawBarsChart(payload) {
     ctx.fillStyle = "#3b82f6";
     ctx.fillRect(padding, 18, 14, 4);
     ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.font = "12px JetBrains Mono, monospace";
+    ctx.font = "14px JetBrains Mono, monospace";
     ctx.fillText("Telegram", padding + 22, 24);
     ctx.fillStyle = "#a855f7";
     ctx.fillRect(padding + 125, 18, 14, 4);

@@ -71,6 +71,13 @@ ssh -i deploy_key -tt $SERVER "bash -s" << ENDSSH
 
   # Start/Restart Server with PM2 (Dev Port 3001)
   pm2 start server.js --name "extract-backend-dev" --update-env || pm2 restart "extract-backend-dev" --update-env
+  
+  # Start/Restart Extrapars with PM2 (Dev Port 3002)
+  echo "🔧 Starting Extrapars..."
+  cd $DIR/extrapars
+  npm install --production > /dev/null
+  PORT=3002 pm2 start server.js --name "extract-extrapars-dev" --update-env || PORT=3002 pm2 restart "extract-extrapars-dev" --update-env
+  
   pm2 save
 
   # 3. Configure Nginx for DEV
@@ -89,6 +96,19 @@ server {
     location /extragram/ {
         alias /var/www/extract-studio-dev/extragram/dist/;
         try_files \$uri \$uri/ /extragram/index.html;
+    }
+
+    location /extrapars/ {
+        try_files \$uri \$uri/ /extrapars/index.html;
+    }
+
+    location /api/analyze {
+        proxy_pass http://localhost:3002;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
     }
 
     location /api/ {

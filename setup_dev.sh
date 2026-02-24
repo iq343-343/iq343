@@ -80,53 +80,74 @@ ssh -i deploy_key -tt $SERVER "bash -s" << ENDSSH
   
   pm2 save
 
+  # Set permissions
+  echo "🔐 Setting permissions..."
+  chmod -R 755 $DIR
+  chown -R www-data:www-data $DIR
+
   # 3. Configure Nginx for DEV
   echo "⚙️ Configuring Nginx for DEV..."
-  cat > /etc/nginx/sites-available/$DOMAIN << 'EOF'
+  cat > /etc/nginx/sites-available/$DOMAIN << EOF
 server {
     listen 80;
     server_name $DOMAIN;
-    root $DIR;
+    root /var/www/extract-studio-dev;
     index index.html;
 
     location / { 
-        try_files \$uri \$uri/ /index.html; 
+        try_files \\\$uri \\\$uri/ /index.html; 
     }
 
     location /extragram/ {
         alias /var/www/extract-studio-dev/extragram/dist/;
-        try_files \$uri \$uri/ /extragram/index.html;
+        try_files \\\$uri \\\$uri/ /extragram/index.html;
     }
 
-    location /extrapars/ {
-        try_files \$uri \$uri/ /extrapars/index.html;
-    }
-
-    location /api/analyze {
-        proxy_pass http://localhost:3002;
+    location ^~ /extrapars/api/ {
+        proxy_pass http://localhost:3002/api/;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Upgrade \\\$http_upgrade;
         proxy_set_header Connection 'upgrade';
-        proxy_set_header Host \$host;
-        proxy_cache_bypass \$http_upgrade;
+        proxy_set_header Host \\\$host;
+        proxy_cache_bypass \\\$http_upgrade;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+    }
+
+    location ^~ /extrapars/ {
+        alias /var/www/extract-studio-dev/extrapars/public/;
+        index index.html;
+        try_files \\\$uri \\\$uri/ /extrapars/index.html;
     }
 
     location /api/ {
         proxy_pass http://localhost:3001;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Upgrade \\\$http_upgrade;
         proxy_set_header Connection 'upgrade';
-        proxy_set_header Host \$host;
-        proxy_cache_bypass \$http_upgrade;
+        proxy_set_header Host \\\$host;
+        proxy_cache_bypass \\\$http_upgrade;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
     }
 }
 EOF
   ln -sf /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
   nginx -t && systemctl reload nginx
   
+  # Diagnostics
+  echo "🔍 Running diagnostics..."
+  pm2 status
+  echo "🌐 Checking ports..."
+  netstat -tulpn | grep -E '3001|3002'
+  echo "📜 Latest Nginx errors:"
+  tail -n 10 /var/log/nginx/error.log
+
   # 3. SSL Setup
   if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
     certbot --nginx --non-interactive --agree-tos --email $EMAIL --redirect -d $DOMAIN
+  else
+    certbot --nginx -n --redirect -d $DOMAIN
   fi
 
   # 4. Install Deployment Key (if missing)

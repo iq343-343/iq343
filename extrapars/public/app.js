@@ -36,7 +36,11 @@ function hasNumber(value) {
 function setStatus(message, isError = false) {
     statusPanel.textContent = message;
     statusPanel.classList.remove("hidden");
-    statusPanel.classList.toggle("error", isError);
+    if (isError) {
+        statusPanel.setAttribute("data-error", "true");
+    } else {
+        statusPanel.removeAttribute("data-error");
+    }
 }
 
 function hideStatus() {
@@ -100,11 +104,13 @@ function formatSignedPercent(value) {
 
 function buildKpiCard(title, value, note = "") {
     const card = document.createElement("div");
-    card.className = "kpi-card";
+    card.className = "bg-slate-800/50 backdrop-blur-sm rounded-2xl p-5 ring-1 ring-white/10 flex flex-col justify-between transition hover:bg-slate-800/80";
     card.innerHTML = `
-    <span class="kpi-title">${title}</span>
-    <span class="kpi-value">${value}</span>
-    ${note ? `<div class="kpi-note">${note}</div>` : ""}
+      <div>
+        <span class="text-slate-400 text-xs font-medium uppercase tracking-wider block mb-2">${title}</span>
+        <div class="text-2xl font-bold text-white">${value}</div>
+      </div>
+      ${note ? `<div class="text-[10px] text-slate-500 mt-4 pt-2 border-t border-slate-700/50 leading-tight">${note}</div>` : ""}
   `;
     return card;
 }
@@ -120,58 +126,41 @@ function renderChannelOverview(payload) {
     const tg = payload.telegram;
     const mx = payload.max.exists ? payload.max.stats : null;
 
-    const tgCard = `
-    <article class="overview-card tg-overview">
-      <div class="overview-head">
-        <img class="overview-avatar" src="${tg.avatarUrl || ""}" alt="Telegram avatar" onerror="this.style.display='none'"/>
-        <div>
-          <div class="overview-platform">Telegram</div>
-          <h3>${tg.title || `@${tg.channel}`}</h3>
-          <a class="overview-link" href="${tg.publicUrl || "#"}" target="_blank" rel="noopener">Открыть канал</a>
-        </div>
-      </div>
-      <p class="overview-desc">${truncateText(tg.description)}</p>
-      <div class="overview-metrics">
-        <span>Подписчики: <b>${formatMetric(tg.subscribers, "integer")}</b></span>
-        <span>ER (Reach): <b>${formatMetric(tg.avgPostReachPct, "percent")}</b></span>
-      </div>
-    </article>
-  `;
+    const buildOverviewCard = (platform, data, exists, colorTheme) => {
+        if (!exists) {
+            return `
+            <div class="bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 ring-1 ring-white/10 flex flex-col justify-center text-center items-center">
+              <div class="text-slate-500 mb-2 font-display uppercase tracking-widest text-xs">MAX</div>
+              <h3 class="text-xl font-bold text-white mb-2">Канал не найден</h3>
+              <p class="text-sm text-slate-400">Сервис не нашёл канал в открытых источниках MAX.</p>
+            </div>`;
+        }
+        return `
+        <div class="bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 ring-1 ring-white/10 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+            <div class="relative flex-shrink-0">
+                <img src="${data.avatarUrl || ""}" alt="${platform} avatar" class="w-20 h-20 rounded-2xl object-cover ring-2 ring-${colorTheme}-500/20 shadow-lg" onerror="this.style.display='none'" />
+            </div>
+            <div class="flex-1">
+                <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
+                    <h2 class="text-xl font-bold text-white font-display leading-tight">${data.title || `@${data.channel}`}</h2>
+                </div>
+                <div class="text-${colorTheme}-400 font-medium text-sm mb-3">@${data.channel || ""} • ${platform}</div>
+                <p class="text-slate-400 text-xs leading-relaxed max-w-lg mb-4 line-clamp-2">${truncateText(data.description, 140)}</p>
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                    <a href="${data.publicUrl || "#"}" target="_blank" rel="noopener" class="text-sm font-medium px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition ring-1 ring-white/10">Открыть канал</a>
+                    <div class="flex gap-4 text-xs">
+                       <span class="text-slate-400">Подписчики: <b class="text-white">${formatMetric(data.subscribers, "compact")}</b></span>
+                       <span class="text-slate-400">ER: <b class="text-white">${formatMetric(data.avgPostReachPct, "percent")}</b></span>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    };
 
-    const mxCard = mx
-        ? `
-    <article class="overview-card max-overview">
-      <div class="overview-head">
-        <img class="overview-avatar" src="${mx.avatarUrl || ""}" alt="MAX avatar" onerror="this.style.display='none'"/>
-        <div>
-          <div class="overview-platform">MAX</div>
-          <h3>${mx.title || `@${mx.channel}`}</h3>
-          <a class="overview-link" href="${mx.publicUrl || "#"}" target="_blank" rel="noopener">Открыть канал</a>
-        </div>
-      </div>
-      <p class="overview-desc">${truncateText(mx.description)}</p>
-      <div class="overview-metrics">
-        <span>Подписчики: <b>${formatMetric(mx.subscribers, "integer")}</b></span>
-        <span>ER (Reach): <b>${formatMetric(mx.avgPostReachPct, "percent")}</b></span>
-      </div>
-    </article>
-  `
-        : `
-    <article class="overview-card max-overview">
-      <div class="overview-head">
-        <div>
-          <div class="overview-platform">MAX</div>
-          <h3>Канал не найден</h3>
-        </div>
-      </div>
-      <p class="overview-desc">Сервис не нашёл канал в открытых источниках MAX (maxchart.ru и max.ru).</p>
-      <div class="overview-metrics">
-        <span>Проверьте username или используйте похожий вариант имени канала.</span>
-      </div>
-    </article>
-  `;
-
-    channelOverview.innerHTML = `${tgCard}${mxCard}`;
+    channelOverview.innerHTML = `
+      ${buildOverviewCard("Telegram", tg, true, "blue")}
+      ${buildOverviewCard("MAX", mx, !!mx, "purple")}
+    `;
 }
 
 function fillTelegramCards(data) {
@@ -250,13 +239,13 @@ function fillComparison(data) {
 
     if (data.bestPlatform === "telegram") {
         winnerTag.textContent = winnerMap.telegram;
-        winnerTag.classList.add("winner-tg");
+        winnerTag.classList.add("bg-blue-500/20", "text-blue-400");
     } else if (data.bestPlatform === "max") {
         winnerTag.textContent = winnerMap.max;
-        winnerTag.classList.add("winner-max");
+        winnerTag.classList.add("bg-purple-500/20", "text-purple-400");
     } else {
         winnerTag.textContent = "Сравнение";
-        winnerTag.classList.add("neutral-tag");
+        winnerTag.classList.add("bg-slate-700", "text-slate-300");
     }
 
     const cards = [
@@ -298,28 +287,28 @@ function fillComparison(data) {
 
     cards.forEach((item) => {
         const card = document.createElement("div");
-        card.className = "comparison-card";
+        card.className = "bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 ring-1 ring-white/10";
         card.innerHTML = `
-      <div class="title">${item.title}</div>
-      <div class="value">${item.value}</div>
+      <div class="text-slate-400 text-[10px] uppercase font-medium tracking-wider mb-2">${item.title}</div>
+      <div class="text-lg font-bold text-white">${item.value}</div>
     `;
         comparisonGrid.appendChild(card);
     });
 }
 
 function drawAxes(ctx, width, height, padding) {
-    ctx.strokeStyle = "rgba(160, 212, 230, 0.22)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(padding, padding);
-    ctx.lineTo(padding, height - padding);
-    ctx.lineTo(width - padding, height - padding);
+    ctx.lineTo(padding, height - padding + 10);
+    ctx.lineTo(width - padding, height - padding + 10);
     ctx.stroke();
 }
 
 function drawNoData(ctx, width, height, text) {
-    ctx.fillStyle = "rgba(210, 238, 247, 0.78)";
-    ctx.font = "18px Manrope, sans-serif";
+    ctx.fillStyle = "rgba(148, 163, 184, 0.8)";
+    ctx.font = "14px JetBrains Mono, monospace";
     ctx.textAlign = "center";
     ctx.fillText(text, width / 2, height / 2);
     ctx.textAlign = "left";
@@ -337,8 +326,8 @@ function showChartTooltip(x, y, title, value) {
 }
 
 function renderBarValueLabel(ctx, xCenter, yTop, value) {
-    ctx.fillStyle = "rgba(225, 246, 255, 0.95)";
-    ctx.font = "13px Manrope, sans-serif";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+    ctx.font = "12px JetBrains Mono, monospace";
     ctx.textAlign = "center";
     ctx.fillText(value, xCenter, Math.max(34, yTop - 8));
 }
@@ -396,10 +385,10 @@ function drawBarsChart(payload) {
         const tgY = height - padding - tgH;
         const mxY = height - padding - mxH;
 
-        ctx.fillStyle = "#66c9ff";
+        ctx.fillStyle = "#3b82f6";
         ctx.fillRect(tgX, tgY, barWidth, tgH);
 
-        ctx.fillStyle = "#b1ff82";
+        ctx.fillStyle = "#a855f7";
         ctx.fillRect(mxX, mxY, barWidth, mxH);
 
         if (hasNumber(metric.tg)) {
@@ -426,20 +415,21 @@ function drawBarsChart(payload) {
             value: formatMetric(metric.mx, metric.format)
         });
 
-        ctx.fillStyle = "rgba(225, 246, 255, 0.92)";
-        ctx.font = "16px Manrope, sans-serif";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+        ctx.font = "12px JetBrains Mono, monospace";
         ctx.textAlign = "center";
-        ctx.fillText(metric.label, center, height - padding + 24);
+        ctx.fillText(metric.label, center, height - padding + 34);
     });
 
     ctx.textAlign = "left";
-    ctx.fillStyle = "#66c9ff";
+    ctx.fillStyle = "#3b82f6";
     ctx.fillRect(padding, 18, 14, 4);
-    ctx.fillStyle = "rgba(215, 245, 255, 0.9)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+    ctx.font = "12px JetBrains Mono, monospace";
     ctx.fillText("Telegram", padding + 22, 24);
-    ctx.fillStyle = "#b1ff82";
+    ctx.fillStyle = "#a855f7";
     ctx.fillRect(padding + 125, 18, 14, 4);
-    ctx.fillStyle = "rgba(215, 245, 255, 0.9)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
     ctx.fillText("MAX", padding + 148, 24);
 }
 
@@ -489,7 +479,7 @@ function render(payload) {
 }
 
 async function analyze(channel) {
-    const response = await fetch("/api/analyze", {
+    const response = await fetch("/extrapars/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channel })

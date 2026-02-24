@@ -47,40 +47,77 @@ ssh -t $SERVER "bash -s" << ENDSSH
     git clone $REPO $DIR
   fi
 
-  # 3. Setup Backend
+  # 3. Setup Backend & Building
   echo "🔧 Setting up Backend..."
   cd $DIR
   npm install --production > /dev/null
 
-  # Create .env file on server (You might want to handle secrets more securely in production)
+  echo "📦 Building Extragram..."
+  cd $DIR/extragram
+  npm install > /dev/null
+  npm run build
+  cd $DIR
+
+  # Create .env file on server 
   echo "TELEGRAM_BOT_TOKEN=8437314985:AAGI1qaOW2KjC2AYWLIZ8eUyetIxe1iuHzg" > .env
   echo "TELEGRAM_CHAT_ID=71247264" >> .env
   echo "PORT=3000" >> .env
 
   # Start/Restart Server with PM2
   pm2 start server.js --name "extract-backend" --update-env || pm2 restart "extract-backend" --update-env
+  
+  # Start/Restart Extrapars with PM2 (Prod Port 3002)
+  echo "🔧 Starting Extrapars..."
+  cd $DIR/extrapars
+  npm install --production > /dev/null
+  PORT=3002 pm2 start server.js --name "extract-extrapars" --update-env || PORT=3002 pm2 restart "extract-extrapars" --update-env
+
   pm2 save
 
   # 4. Configure Nginx
   echo "⚙️ Configuring Nginx..."
-  cat > /etc/nginx/sites-available/$DOMAIN << 'EOF'
+  cat > /etc/nginx/sites-available/$DOMAIN << EOF
 server {
     listen 80;
     server_name $DOMAIN www.$DOMAIN;
-    root $DIR;
+    root /var/www/extract-studio;
     index index.html;
 
     location / {
-        try_files \$uri \$uri/ =404;
+        try_files \\\$uri \\\$uri/ /index.html;
+    }
+
+    location /extragram/ {
+        alias /var/www/extract-studio/extragram/dist/;
+        try_files \\\$uri \\\$uri/ /extragram/index.html;
+    }
+
+    location ^~ /extrapars/api/ {
+        proxy_pass http://localhost:3002/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \\\$host;
+        proxy_cache_bypass \\\$http_upgrade;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+    }
+
+    location ^~ /extrapars/ {
+        alias /var/www/extract-studio/extrapars/public/;
+        index index.html;
+        try_files \\\$uri \\\$uri/ /extrapars/index.html;
     }
 
     location /api/ {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Upgrade \\\$http_upgrade;
         proxy_set_header Connection 'upgrade';
-        proxy_set_header Host \$host;
-        proxy_cache_bypass \$http_upgrade;
+        proxy_set_header Host \\\$host;
+        proxy_cache_bypass \\\$http_upgrade;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
     }
 }
 EOF
@@ -88,9 +125,17 @@ EOF
   rm -f /etc/nginx/sites-enabled/default
   nginx -t && systemctl restart nginx
   
+  # Diagnostics
+  echo "🔍 Running diagnostics..."
+  pm2 status
+  echo "📜 Latest Nginx errors:"
+  tail -n 10 /var/log/nginx/error.log
+  
   # 5. SSL Setup
   if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
     certbot --nginx --non-interactive --agree-tos --email $EMAIL --redirect -d $DOMAIN -d www.$DOMAIN
+  else
+    certbot --nginx -n --redirect -d $DOMAIN -d www.$DOMAIN
   fi
 
   # 6. Install Deployment Key for GitHub Actions

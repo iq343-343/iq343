@@ -80,6 +80,10 @@ ssh -i deploy_key -tt $SERVER "bash -s" << ENDSSH
   
   pm2 save
 
+  # Set permissions
+  echo "🔐 Setting permissions..."
+  chmod -R 755 $DIR
+
   # 3. Configure Nginx for DEV
   echo "⚙️ Configuring Nginx for DEV..."
   cat > /etc/nginx/sites-available/$DOMAIN << 'EOF'
@@ -100,11 +104,12 @@ server {
 
     location /extrapars/ {
         alias /var/www/extract-studio-dev/extrapars/public/;
+        index index.html;
         try_files \$uri \$uri/ /extrapars/index.html;
     }
 
-    location /api/analyze {
-        proxy_pass http://localhost:3002;
+    location /extrapars/api/ {
+        proxy_pass http://localhost:3002/api/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';

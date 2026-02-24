@@ -99,6 +99,7 @@ server {
     }
 
     location /extrapars/ {
+        alias /var/www/extract-studio-dev/extrapars/public/;
         try_files \$uri \$uri/ /extrapars/index.html;
     }
 
@@ -109,6 +110,8 @@ server {
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host \$host;
         proxy_cache_bypass \$http_upgrade;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 
     location /api/ {
@@ -118,6 +121,8 @@ server {
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host \$host;
         proxy_cache_bypass \$http_upgrade;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 }
 EOF

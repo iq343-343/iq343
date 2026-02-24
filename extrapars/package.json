@@ -1,16 +1,16 @@
 {
-    "name": "extrapars",
-    "version": "1.0.0",
-    "description": "Сервис сравнения статистики Telegram и MAX каналов",
-    "main": "server.js",
-    "scripts": {
-        "start": "node server.js"
-    },
-    "keywords": [
-        "telegram",
-        "max",
-        "analytics",
-        "parser"
-    ],
-    "license": "MIT"
+  "name": "extra-scope",
+  "version": "1.0.0",
+  "description": "Сервис глубокой аналитики Telegram-каналов — Extra Scope",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "telegram",
+    "max",
+    "analytics",
+    "parser"
+  ],
+  "license": "MIT"
 }

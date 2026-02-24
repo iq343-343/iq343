@@ -102,6 +102,11 @@ function formatSignedPercent(value) {
     return `${value > 0 ? "+" : ""}${value}%`;
 }
 
+function formatSignedNumber(value) {
+    if (!hasNumber(value)) return "н/д";
+    return `${value > 0 ? "+" : ""}${formatMetric(value, "integer")}`;
+}
+
 function buildKpiCard(title, value, note = "") {
     const card = document.createElement("div");
     card.className = "bg-slate-800/50 backdrop-blur-sm rounded-2xl p-5 ring-1 ring-white/10 flex flex-col justify-between transition hover:bg-slate-800/80";
@@ -171,7 +176,7 @@ function fillTelegramCards(data) {
         buildKpiCard("Средние просмотры", formatMetric(data.avgViews, "integer")),
         buildKpiCard("Средние реакции", formatMetric(data.avgReactions, "integer")),
         buildKpiCard("ER (Engagement Rate)", formatMetric(data.avgPostReachPct, "percent")),
-        buildKpiCard("Рост за 30 дней", `${formatMetric(data.growth30d, "percent")} (+${formatMetric(data.growth30dValue, "integer")} чел.)`),
+        buildKpiCard("Рост за 30 дней", hasNumber(data.growth30d) ? `${formatSignedPercent(data.growth30d)} (${formatSignedNumber(data.growth30dValue)} чел.)` : "н/д"),
         buildKpiCard(
             "Постов в неделю",
             formatMetric(data.postsPerWeek, "number"),
@@ -400,7 +405,7 @@ function render(payload) {
 }
 
 async function analyze(channel) {
-    const response = await fetch("/extrapars/api/analyze", {
+    const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channel })

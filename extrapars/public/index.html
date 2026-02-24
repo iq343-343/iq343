@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Extrapars — Аналитика Telegram и MAX</title>
+  <title>Extra Scope — Аналитика Telegram и MAX</title>
 
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -91,12 +91,15 @@
                 d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
             </svg>
           </div>
-          <span class="text-lg font-bold tracking-tight text-white font-display">Extrapars</span>
+          <span class="text-lg font-bold tracking-tight text-white font-display">Extra Scope</span>
         </a>
-        <nav class="hidden md:flex items-center gap-8">
-          <a href="/"
-            class="text-sm font-medium text-slate-400 transition-colors hover:text-blue-400 flex items-center gap-1">На
-            главный сайт</a>
+        <nav class="hidden md:flex items-center gap-6">
+          <a href="#faq" class="text-sm font-medium text-slate-400 hover:text-white transition-colors">FAQ</a>
+          <a href="https://t.me/extract343" target="_blank"
+            class="rounded-lg bg-blue-600/20 text-blue-400 px-4 py-2 text-sm font-semibold hover:bg-blue-600/30 transition-all flex items-center gap-2 border border-blue-500/30">
+            <img src="./images/ikon/Логотип Telegram.png" alt="Telegram" class="w-4 h-4 object-contain">
+            Extract Studio в телеграм
+          </a>
         </nav>
       </div>
     </header>
@@ -208,13 +211,56 @@
           </div>
 
         </div>
+
+        <!-- FAQ Section -->
+        <div id="faq" class="w-full max-w-4xl mx-auto mt-20 mb-12">
+          <h2 class="text-2xl text-white font-display mb-6 border-b border-slate-800 pb-3">FAQ и функционал</h2>
+          <div class="space-y-4">
+            <details class="bg-slate-800/40 backdrop-blur-md rounded-2xl ring-1 ring-white/10 group">
+              <summary class="flex justify-between items-center cursor-pointer p-5 text-white font-medium outline-none">
+                Что такое Extra Scope?
+              </summary>
+              <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/50 mt-2 pt-4">
+                Это профессиональный инструмент для анализа Telegram-каналов, объединяющий данные из открытых источников
+                и внутренние метрики для оценки качества аудитории и эффективности размещения рекламы.
+              </div>
+            </details>
+            <details class="bg-slate-800/40 backdrop-blur-md rounded-2xl ring-1 ring-white/10 group">
+              <summary class="flex justify-between items-center cursor-pointer p-5 text-white font-medium outline-none">
+                Как работает анализ?
+              </summary>
+              <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/50 mt-2 pt-4">
+                Extra Scope сканирует последние публикации канала, анализирует динамику просмотров, реакций и репостов,
+                вычисляя реальный ERR (Engagement Rate by Reach) и другие КПИ.
+              </div>
+            </details>
+            <details class="bg-slate-800/40 backdrop-blur-md rounded-2xl ring-1 ring-white/10 group">
+              <summary class="flex justify-between items-center cursor-pointer p-5 text-white font-medium outline-none">
+                Для чего нужны кнопки Telegram extract?
+              </summary>
+              <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/50 mt-2 pt-4">
+                В канале <b>extract</b> мы публикуем регулярные подборки качественных площадок, кейсы по закупке трафика
+                и обновления сервиса Extra Scope.
+              </div>
+            </details>
+            <details class="bg-slate-800/40 backdrop-blur-md rounded-2xl ring-1 ring-white/10 group">
+              <summary class="flex justify-between items-center cursor-pointer p-5 text-white font-medium outline-none">
+                Безопасно ли это?
+              </summary>
+              <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/50 mt-2 pt-4">
+                Абсолютно. Мы используем только публично доступные данные (`t.me/s/`) и не требуем авторизации или
+                доступа к вашему аккаунту.
+              </div>
+            </details>
+          </div>
+        </div>
       </div>
     </main>
 
     <!-- Footer -->
     <footer class="border-t border-slate-800 bg-slate-950 py-8 mt-12">
       <div class="mx-auto max-w-7xl px-4 text-center text-sm text-slate-500">
-        <p>© 2026 Extrapars. Developed by <a href="/"
+        <p>© 2026 Extra Scope. Developed by <a href="/"
             class="text-blue-500/80 hover:text-blue-400 transition-colors">Extract Studio</a>.</p>
       </div>
     </footer>

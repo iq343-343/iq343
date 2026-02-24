@@ -146,6 +146,8 @@ EOF
   # 3. SSL Setup
   if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
     certbot --nginx --non-interactive --agree-tos --email $EMAIL --redirect -d $DOMAIN
+  else
+    certbot --nginx -n --redirect -d $DOMAIN
   fi
 
   # 4. Install Deployment Key (if missing)

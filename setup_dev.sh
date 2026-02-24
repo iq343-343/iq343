@@ -87,7 +87,7 @@ ssh -i deploy_key -tt $SERVER "bash -s" << ENDSSH
 
   # 3. Configure Nginx for DEV
   echo "⚙️ Configuring Nginx for DEV..."
-  cat > /etc/nginx/sites-available/$DOMAIN << 'EOF'
+  cat > /etc/nginx/sites-available/$DOMAIN << EOF
 server {
     listen 80;
     server_name $DOMAIN;

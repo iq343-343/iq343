@@ -140,6 +140,10 @@ function renderChannelOverview(payload) {
               <p class="text-sm text-slate-400">Сервис не нашёл канал в открытых источниках MAX.</p>
             </div>`;
         }
+        const platformIcon = platform === "Telegram"
+            ? `<img src="./images/ikon/Логотип Telegram.png" alt="Telegram Icon" class="w-4 h-4 object-contain opacity-90">`
+            : `<img src="./images/ikon/Иконка Макс 2025.png" alt="MAX Icon" class="w-4 h-4 object-contain opacity-90">`;
+
         return `
         <div class="bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 ring-1 ring-white/10 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
             <div class="relative flex-shrink-0">
@@ -149,7 +153,10 @@ function renderChannelOverview(payload) {
                 <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
                     <h2 class="text-xl font-bold text-white font-display leading-tight">${data.title || `@${data.channel}`}</h2>
                 </div>
-                <div class="text-${colorTheme}-400 font-medium text-sm mb-3">@${data.channel || ""} • ${platform}</div>
+                <div class="flex items-center justify-center md:justify-start gap-1.5 text-${colorTheme}-400 font-medium text-sm mb-3">
+                    <span>@${data.channel || ""} • ${platform}</span>
+                    ${platformIcon}
+                </div>
                 <p class="text-slate-400 text-xs leading-relaxed max-w-lg mb-4 line-clamp-2">${truncateText(data.description, 140)}</p>
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-4">
                     <a href="${data.publicUrl || "#"}" target="_blank" rel="noopener" class="text-sm font-medium px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition ring-1 ring-white/10">Открыть канал</a>
@@ -405,7 +412,7 @@ function render(payload) {
 }
 
 async function analyze(channel) {
-    const response = await fetch("/extrapars/api/analyze", {
+    const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channel })
@@ -476,4 +483,31 @@ window.addEventListener("DOMContentLoaded", async () => {
         channelInput.value = initialChannel.startsWith("@") ? initialChannel : `@${initialChannel}`;
         await runAnalyze(channelInput.value.trim(), false);
     }
+});
+
+// Telegram-style Accordion Animation Logic
+document.querySelectorAll('details').forEach((el) => {
+    const summary = el.querySelector('summary');
+    const content = el.querySelector('summary ~ *');
+
+    if (!summary || !content) return;
+
+    summary.addEventListener('click', (e) => {
+        // Only handle closing (when it's already open)
+        if (el.hasAttribute('open')) {
+            e.preventDefault(); // Stop immediate close
+
+            // Add closing class to trigger CSS animation
+            el.classList.add('closing');
+
+            // Wait for animation to finish then actually remove the open attribute
+            const onAnimationEnd = () => {
+                el.removeAttribute('open');
+                el.classList.remove('closing');
+                content.removeEventListener('animationend', onAnimationEnd);
+            };
+
+            content.addEventListener('animationend', onAnimationEnd);
+        }
+    });
 });

@@ -1133,7 +1133,7 @@ const server = http.createServer(async (request, response) => {
       return;
     }
 
-    if (request.method === "POST" && pathname === "/api/analyze") {
+    if (request.method === "POST" && (pathname === "/api/analyze" || pathname === "/scope/api/analyze")) {
       const rawBody = await readBody(request);
       let payload = {};
       if (rawBody.trim()) {

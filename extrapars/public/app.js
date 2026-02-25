@@ -412,7 +412,7 @@ function render(payload) {
 }
 
 async function analyze(channel) {
-    const response = await fetch("/scope/api/analyze", {
+    const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channel })

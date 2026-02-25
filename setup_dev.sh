@@ -72,11 +72,11 @@ ssh -i deploy_key -tt $SERVER "bash -s" << ENDSSH
   # Start/Restart Server with PM2 (Dev Port 3001)
   pm2 start server.js --name "extract-backend-dev" --update-env || pm2 restart "extract-backend-dev" --update-env
   
-  # Start/Restart Extrapars with PM2 (Dev Port 3002)
+  # Start/Restart Extrapars with PM2 (Dev Port 3003)
   echo "🔧 Starting Extrapars..."
   cd $DIR/extrapars
   npm install --production > /dev/null
-  PORT=3002 pm2 start server.js --name "extract-extrapars-dev" --update-env || PORT=3002 pm2 restart "extract-extrapars-dev" --update-env
+  PORT=3003 pm2 start server.js --name "extract-extrapars-dev" --update-env || PORT=3003 pm2 restart "extract-extrapars-dev" --update-env
   
   pm2 save
 
@@ -104,7 +104,7 @@ server {
     }
 
     location ^~ /extrapars/api/ {
-        proxy_pass http://localhost:3002/api/;
+        proxy_pass http://localhost:3003/api/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \\\$http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -139,7 +139,7 @@ EOF
   echo "🔍 Running diagnostics..."
   pm2 status
   echo "🌐 Checking ports..."
-  netstat -tulpn | grep -E '3001|3002'
+  netstat -tulpn | grep -E '3001|3003'
   echo "📜 Latest Nginx errors:"
   tail -n 10 /var/log/nginx/error.log
 

@@ -103,7 +103,7 @@ server {
         try_files \\\$uri \\\$uri/ /extragram/index.html;
     }
 
-    location ^~ /extrapars/api/ {
+    location ^~ /scope/api/ {
         proxy_pass http://localhost:3003/api/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \\\$http_upgrade;
@@ -114,10 +114,10 @@ server {
         proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
     }
 
-    location ^~ /extrapars/ {
+    location ^~ /scope/ {
         alias /var/www/extract-studio-dev/extrapars/public/;
         index index.html;
-        try_files \\\$uri \\\$uri/ /extrapars/index.html;
+        try_files \\\$uri \\\$uri/ /scope/index.html;
     }
 
     location /api/ {

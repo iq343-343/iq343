@@ -62,6 +62,38 @@
     }
   }
 
+  // Push notifications reveal animation
+  const pushStack = document.querySelector('.push-stack');
+  if (pushStack) {
+    const pushItems = Array.from(pushStack.querySelectorAll('.push-notification'));
+    pushItems.forEach((pushp, i) => {
+      pushp.style.transitionDelay = `${i * 150}ms`;
+    });
+
+    if (reduceMotion) {
+      pushItems.forEach(p => p.classList.add('is-visible'));
+    } else if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries, obs) => {
+        let isAnyIntersecting = false;
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            isAnyIntersecting = true;
+          }
+        });
+
+        if (isAnyIntersecting) {
+          pushItems.forEach(p => p.classList.add('is-visible'));
+          obs.disconnect(); // Stop observing once triggered
+        }
+      }, { threshold: 0.2 });
+
+      // Observe the container itself
+      observer.observe(pushStack);
+    } else {
+      pushItems.forEach(p => p.classList.add('is-visible'));
+    }
+  }
+
   // Dark Mode Logic
   const themeToggle = document.querySelector('.theme-toggle');
   const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');

@@ -508,70 +508,47 @@
         <section class="products container" id="products">
             <div class="products-section-card">
                 <h2 class="section-title">Продукты</h2>
-                <p class="products-intro">Инструменты для маркетологов и бизнеса, разработанные Extract.</p>
+                <p class="products-intro">Инструменты для маркетологов и бизнеса, разработанные Extract Studio.</p>
 
-                <div class="products-grid">
-                    <!-- Product 1: Extragram -->
-                    <a href="./extragram/" class="product-card product-card--featured">
-                        <div class="product-card__accent product-card__accent--blue"></div>
-                        <div class="product-card__body">
-                            <div class="product-card__header">
-                                <div class="product-card__icon">
-                                    <img src="./images/ikon/Логотип Telegram.png" alt="Telegram"
-                                        style="width: 28px; height: 28px; object-fit: contain;">
-                                </div>
-                                <span class="tag tag--blue">NEW</span>
-                            </div>
-                            <h3 class="product-card__name">Extragram</h3>
-                            <p class="product-card__desc">Аналитика Telegram-каналов. Подписчики, просмотры и динамика
-                                роста — в один клик.</p>
-                            <span class="product-card__link">Открыть →</span>
-                        </div>
-                    </a>
-
-                    <!-- Product 2: Extra.Scope -->
-                    <a href="./scope/" class="product-card">
+                <div class="products-grid products-grid--single">
+                    <!-- Extract Scope -->
+                    <a href="./scope/" class="product-card product-card--featured">
                         <div class="product-card__accent product-card__accent--green"></div>
                         <div class="product-card__body">
                             <div class="product-card__header">
-                                <div class="product-card__icon">
-                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
+                                <div class="product-card__icon product-card__icon--animated">
+                                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg" class="scope-animation">
+                                        <!-- Concentric circles radar -->
+                                        <circle cx="24" cy="24" r="16" stroke="currentColor" stroke-width="1"
+                                            opacity="0.2" class="radar-scan" />
+                                        <circle cx="24" cy="24" r="10" stroke="currentColor" stroke-width="1.5"
+                                            stroke-dasharray="4 4" />
+                                        <circle cx="24" cy="24" r="3" fill="currentColor" />
+
+                                        <!-- Crosshairs -->
+                                        <path d="M24 2v40M4 24h40" stroke="currentColor" stroke-width="1.5"
+                                            stroke-linecap="round" opacity="0.4" />
+
+                                        <!-- Spinning target lock -->
+                                        <g class="target-lock">
+                                            <path d="M14 14L10 10M34 14L38 10M14 34L10 38M34 34L38 38"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                            <path d="M12 24A12 12 0 0 1 24 12" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" class="arc-pulse" />
+                                        </g>
                                     </svg>
                                 </div>
-                                <span class="product-card__status product-card__status--live">LIVE</span>
+                                <span class="product-card__status product-card__status--live">BETA</span>
                             </div>
-                            <h3 class="product-card__name">Extrapars</h3>
-                            <p class="product-card__desc">Сравнение каналов в Telegram и MAX. Метрики, охваты и динамика
-                                из открытых источников.</p>
+                            <h3 class="product-card__name">Extract Scope</h3>
+                            <p class="product-card__desc">Аналитика и сравнение Telegram-каналов и каналов мессенджера
+                                MAX. Точные
+                                метрики, поиск аудитории и статистика для эффективных рекламных
+                                кампаний.</p>
                             <span class="product-card__link">Открыть →</span>
                         </div>
                     </a>
-
-                    <!-- Product 3: Coming Soon -->
-                    <div class="product-card product-card--soon">
-                        <div class="product-card__accent product-card__accent--green"></div>
-                        <div class="product-card__body">
-                            <div class="product-card__header">
-                                <div class="product-card__icon">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-                                            fill="currentColor" />
-                                    </svg>
-                                </div>
-                                <span class="product-card__status product-card__status--planned">Скоро</span>
-                            </div>
-                            <h3 class="product-card__name">Новый продукт</h3>
-                            <p class="product-card__desc">Скоро анонс. Следите за обновлениями в нашем телеграм-канале.
-                            </p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -625,34 +602,42 @@
                 <p class="work-desc">От первого сообщения до запуска — простой и прозрачный процесс. Мы ценим ваше время
                     и сразу переходим к делу.</p>
 
-                <div class="steps-grid">
-                    <div class="step-card" data-step="1">
-                        <div class="step-card__header">
-                            <div class="step-card__emoji">✍️</div>
-                        </div>
-                        <p class="step-card__text">Оставьте заявку или напишите нам в телеграм. Оперативно ответим в
-                            рабочее время</p>
-                    </div>
+                <div class="work-push-layout">
 
-                    <div class="step-card" data-step="2">
-                        <div class="step-card__header">
-                            <div class="step-card__emoji">🤝</div>
+                    <div class="push-stack">
+                        <div class="push-notification" data-step="1">
+                            <div class="push-icon">✍️</div>
+                            <div class="push-content">
+                                <span class="push-title">Заявка получена</span>
+                                <span class="push-desc">Оставьте заявку или напишите нам в Telegram. Работаем
+                                    оперативно.</span>
+                            </div>
+                            <span class="push-time">Сейчас</span>
                         </div>
-                        <p class="step-card__text">Познакомимся и внимательно забрифуем ваш проект</p>
-                    </div>
-
-                    <div class="step-card" data-step="3">
-                        <div class="step-card__header">
-                            <div class="step-card__emoji">💡</div>
+                        <div class="push-notification" data-step="2">
+                            <div class="push-icon">🤝</div>
+                            <div class="push-content">
+                                <span class="push-title">Знакомство</span>
+                                <span class="push-desc">Внимательно забрифуем проект и поймем ваши задачи.</span>
+                            </div>
+                            <span class="push-time">1м назад</span>
                         </div>
-                        <p class="step-card__text">Предложим решение и сроки реализации</p>
-                    </div>
-
-                    <div class="step-card" data-step="4" id="step-rocket">
-                        <div class="step-card__header">
-                            <div class="step-card__emoji" id="rocket-emoji">🚀</div>
+                        <div class="push-notification" data-step="3">
+                            <div class="push-icon">💡</div>
+                            <div class="push-content">
+                                <span class="push-title">Решение готово</span>
+                                <span class="push-desc">Предложим оптимальное решение и точные сроки реализации.</span>
+                            </div>
+                            <span class="push-time">2м назад</span>
                         </div>
-                        <p class="step-card__text">Договоримся о деталях и приступим к работе</p>
+                        <div class="push-notification" data-step="4">
+                            <div class="push-icon">🚀</div>
+                            <div class="push-content">
+                                <span class="push-title">Старт работы</span>
+                                <span class="push-desc">Договоримся о деталях и сразу приступим к делу.</span>
+                            </div>
+                            <span class="push-time">5м назад</span>
+                        </div>
                     </div>
                 </div>
 
